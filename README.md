@@ -150,9 +150,6 @@ Todo o restante (login, assinaturas, pagamento, envio de e-mail, filas, etc.) es
 ├── tsconfig.build.json
 └── tsconfig.json
 ```
-
-> Estrutura planejada em camadas (controllers → services → repositories). Ainda em construção conforme os endpoints são implementados.
-
 ---
 
 ## ⚙️ Como executar
