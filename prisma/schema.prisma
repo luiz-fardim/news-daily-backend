@@ -1,0 +1,71 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            Int            @id @default(autoincrement())
+  first_name    String
+  last_name     String
+  birthday DateTime @db.Date
+  email         String         @unique
+  password      String
+  role          Role           @default(USER)
+  created_at    DateTime       @default(now())
+  updated_at    DateTime       @updatedAt
+  deleted_at    DateTime?
+  subscriptions Subscription[]
+}
+
+model Plan {
+  id                     Int             @id @default(autoincrement())
+  name                   Name
+  price                  Decimal         @db.Decimal(10, 2)
+  billing_interval       BillingInterval
+  billing_interval_count Int             @default(1)
+  subscriptions          Subscription[]
+}
+
+model Subscription {
+  id                     Int                @id @default(autoincrement())
+  user                   User               @relation(fields: [user_id], references: [id])
+  user_id                Int
+  plan                   Plan               @relation(fields: [plan_id], references: [id])
+  plan_id                Int
+  price_at_signing       Decimal            @db.Decimal(10, 2)
+  status                 SubscriptionStatus @default(ACTIVE)
+  stripe_subscription_id String?            @unique
+  started_at             DateTime           @default(now())
+  expires_at             DateTime
+  canceled_at            DateTime?
+  created_at             DateTime           @default(now())
+  updated_at             DateTime           @updatedAt
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Name {
+  BRIEF
+  INSIDE
+  ELITE
+}
+
+enum BillingInterval {
+  MONTH
+  YEAR
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  EXPIRED
+  PAST_DUE
+}
