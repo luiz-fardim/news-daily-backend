@@ -33,9 +33,10 @@ O produto foi pensado para pessoas com rotina corrida que querem se manter infor
 **Status atual:** o projeto está no início. Até agora já foram feitos:
 - ✅ Modelagem do banco de dados (`schema.prisma`)
 - ✅ Conexão com o banco de dados
-- ✅ Rota de registro de usuário (`POST /auth/register`)
+- ✅ Rota de registro de usuário (`POST /auth/signup`)
+- ✅ Rota de login do usuário (`POST /auth/signin`)
 
-Todo o restante (login, assinaturas, pagamento, envio de e-mail, filas, etc.) está planejado e detalhado no roadmap abaixo.
+Todo o restante (assinaturas, pagamento, envio de e-mail, filas, etc.) está planejado e detalhado no roadmap abaixo.
 
 ---
 
@@ -65,7 +66,7 @@ Todo o restante (login, assinaturas, pagamento, envio de e-mail, filas, etc.) es
 ### 🔜 Planejado
 
 **Usuário**
-- [ ] Login (JWT)
+- [x] Login (JWT)
 - [ ] Escolher plano de assinatura
 - [ ] Efetuar pagamento
 - [ ] Visualizar assinatura
@@ -207,8 +208,8 @@ npm run dev
 
 | Status | Método | Rota             | Descrição                          |
 | :----: | ------ | ----------------- | ------------------------------------- |
-| ✅     | POST   | `/auth/register`  | Cadastro (nome, email, senha)         |
-| 🔜     | POST   | `/auth/login`      | Login, retorna JWT                    |
+| ✅     | POST   | `/auth/signup`  | Cadastro (first_name, last_name, birthday, email e password)         |
+| ✅     | POST   | `/auth/signin`      | Login, retorna JWT                    |
 | 🔜     | POST   | `/auth/refresh`    | Renova o access token                 |
 
 ### Users
