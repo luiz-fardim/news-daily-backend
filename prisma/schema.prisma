@@ -20,7 +20,21 @@ model User {
   updated_at    DateTime       @updatedAt
   deleted_at    DateTime?
   subscriptions Subscription[]
+  refresh_tokens RefreshToken[]
 }
+
+model RefreshToken {
+  id                   String   @id @default(uuid())
+  tokenHash            String   @unique
+  user                 User     @relation(fields: [user_id], references: [id])
+  user_id              Int
+  expiresAt            DateTime
+  revoked              Boolean  @default(false)
+  replacedByTokenHash  String?
+  createdAt            DateTime @default(now())
+
+  @@index([user_id])
+}   
 
 model Plan {
   id                     Int             @id @default(autoincrement())

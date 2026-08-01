@@ -5,6 +5,7 @@ import argon2 from 'argon2';
 import { PrismaService } from 'src/prisma.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
+import { createHash, randomBytes} from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -54,17 +55,77 @@ export class AuthService {
     }
     const payload = { email: user.email, id: user.id}
 
-    return await this.generateToken(payload)
+    return await this.generateTokens(payload.id.toString(), payload.email)
   }
 
-  async generateToken(payload: { email: string, id: number }) {
-    const secret = this.configService.get<string>('secrets.jwt_secret') ?? process.env.JWT_SECRET;
+  async generateTokens(userId: string, email: string) {
+    const secret = this.configService.get<string>('JWT_SECRET');
+    const accessToken = this.jwtService.sign(
+      { 
+        sub: userId, email,
+        expiresIn: '15m'
+       },
+      { 
+        secret
+       }
+    );
 
-    if (!secret) {
-      throw new Error('JWT_SECRET is not configured');
+    const refreshToken = randomBytes(64).toString('hex');
+    const tokenHash = this.hashToken(refreshToken);
+
+    await this.prismaService.refreshToken.create({
+      data: {
+        user_id: parseInt(userId),
+        tokenHash,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 dias
+      },
+    });
+
+    return { accessToken, refreshToken };
+  }
+
+  private hashToken(token: string): string {
+    return createHash('sha256').update(token).digest('hex');
+  }
+
+  async refreshTokens(oldRefreshToken: string) {
+    const tokenHash = this.hashToken(oldRefreshToken);
+
+    const stored = await this.prismaService.refreshToken.findUnique({
+      where: { tokenHash },
+      include: { user: true },
+    });
+
+    if (!stored) {
+      throw new UnauthorizedException('Refresh token inválido');
     }
 
-    const token = this.jwtService.sign(payload, { secret });
-    return { accessToken: token };
+    if (stored.revoked) {
+      await this.revokeAllUserTokens(stored.user_id.toString());
+      throw new UnauthorizedException('Token reutilizado, sessão revogada por segurança');
+    }
+
+    if (stored.expiresAt < new Date()) {
+      throw new UnauthorizedException('Refresh token expirado');
+    }
+
+    await this.prismaService.refreshToken.update({
+      where: { id: stored.id },
+      data: { revoked: true },
+    });
+
+    return this.generateTokens(stored.user_id.toString(), stored.user.email);
+  }
+
+  async revokeAllUserTokens(userId: string) {
+    await this.prismaService.refreshToken.updateMany({
+      where: { user_id: parseInt(userId) },
+      data: { revoked: true },
+    });
+  }
+
+  async logout(refreshToken: string) {
+    const tokenHash = this.hashToken(refreshToken);
+    await this.prismaService.refreshToken.deleteMany({ where: { tokenHash } });
   }
 }
