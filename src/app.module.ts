@@ -27,14 +27,8 @@ import { UsersModule } from './modules/users/users.module';
   ],
   controllers: [],
   providers: [
-    {
-      provide: APP_FILTER,
-      useClass: AllExceptionsFilter
-    },
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
-    }
+    { provide: APP_FILTER, useClass: AllExceptionsFilter },
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
   ],
 })
 export class AppModule {}

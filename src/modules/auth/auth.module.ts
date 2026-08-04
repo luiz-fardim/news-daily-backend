@@ -4,11 +4,14 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { PrismaService } from 'src/prisma.service';
+import { PassportModule } from '@nestjs/passport';
+import { JwtStrategy } from 'src/guards/strategies/jwt.strategy';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService, PrismaService, JwtService],
+  providers: [AuthService, PrismaService, JwtService, JwtStrategy],
   imports: [
+    PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

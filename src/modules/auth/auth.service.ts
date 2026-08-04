@@ -10,6 +10,7 @@ import { PrismaService } from 'src/prisma.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { createHash, randomBytes } from 'crypto';
+import { Role } from 'src/generated/prisma/browser';
 
 @Injectable()
 export class AuthService {
@@ -37,6 +38,7 @@ export class AuthService {
       data: {
         ...data,
         birthday: new Date(data.birthday),
+        role: Role.ADMIN
       },
     });
     const { password, ...userWithoutPassword } = user;
@@ -44,10 +46,10 @@ export class AuthService {
   }
 
   async compare(data: LoginAuthDto) {
-    const user: { email: string; password: string; id: number } | null =
+    const user: { email: string; password: string; id: number, role: Role } | null =
       await this.prismaService.user.findFirst({
         where: { email: data.email },
-        select: { email: true, password: true, id: true },
+        select: { email: true, password: true, id: true, role: true },
       });
 
     if (!user) {
@@ -59,15 +61,15 @@ export class AuthService {
     if (!isMatch) {
       throw new UnauthorizedException('Invalid Credentials');
     }
-    const payload = { email: user.email, id: user.id };
+    const payload = { email: user.email, id: user.id, role: user.role };
 
-    return await this.generateTokens(payload.id.toString(), payload.email);
+    return await this.generateTokens(payload.id.toString(), payload.email, payload.role);
   }
 
-  async generateTokens(userId: string, email: string) {
+  async generateTokens(userId: string, email: string, role: Role) {
     const secret = this.configService.get<string>('JWT_SECRET');
     const accessToken = this.jwtService.sign(
-      { sub: userId, email },
+      { sub: userId, email, role },
       { secret, expiresIn: '15m' },
     );
 
@@ -117,7 +119,7 @@ export class AuthService {
       data: { revoked: true },
     });
 
-    return this.generateTokens(stored.user_id.toString(), stored.user.email);
+    return this.generateTokens(stored.user_id.toString(), stored.user.email, stored.user.role);
   }
 
   async revokeAllUserTokens(userId: string) {
