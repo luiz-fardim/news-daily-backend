@@ -1,11 +1,15 @@
-import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import argon2 from 'argon2';
 import { PrismaService } from 'src/prisma.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
-import { createHash, randomBytes} from 'crypto';
+import { createHash, randomBytes } from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -18,12 +22,12 @@ export class AuthService {
   async create(data: CreateAuthDto) {
     const alreadyExists = await this.prismaService.user.findFirst({
       where: {
-        email: data.email
-      }
-    })
+        email: data.email,
+      },
+    });
 
     if (alreadyExists) {
-      throw new ConflictException("Invalid Credentials")
+      throw new ConflictException('A user with this email already exists.');
     }
 
     const hash = await argon2.hash(data.password);
@@ -40,34 +44,31 @@ export class AuthService {
   }
 
   async compare(data: LoginAuthDto) {
-    const user: { email: string, password: string, id: number } | null = await this.prismaService.user.findFirst({
-      where: { email: data.email },
-      select: { email: true, password: true, id: true }
-    })
+    const user: { email: string; password: string; id: number } | null =
+      await this.prismaService.user.findFirst({
+        where: { email: data.email },
+        select: { email: true, password: true, id: true },
+      });
 
     if (!user) {
-      throw new UnauthorizedException("Invalid Credentials")
+      throw new UnauthorizedException('Invalid Credentials');
     }
-    const isMatch = await argon2.verify(user?.password, data.password)
+    const ramdomHash = randomBytes(64).toString('hex');
+    const isMatch = await argon2.verify(user?.password ?? ramdomHash, data.password);
 
     if (!isMatch) {
-      throw new UnauthorizedException("Invalid Credentials")
+      throw new UnauthorizedException('Invalid Credentials');
     }
-    const payload = { email: user.email, id: user.id}
+    const payload = { email: user.email, id: user.id };
 
-    return await this.generateTokens(payload.id.toString(), payload.email)
+    return await this.generateTokens(payload.id.toString(), payload.email);
   }
 
   async generateTokens(userId: string, email: string) {
     const secret = this.configService.get<string>('JWT_SECRET');
     const accessToken = this.jwtService.sign(
-      { 
-        sub: userId, email,
-        expiresIn: '15m'
-       },
-      { 
-        secret
-       }
+      { sub: userId, email },
+      { secret, expiresIn: '15m' },
     );
 
     const refreshToken = randomBytes(64).toString('hex');
@@ -102,7 +103,9 @@ export class AuthService {
 
     if (stored.revoked) {
       await this.revokeAllUserTokens(stored.user_id.toString());
-      throw new UnauthorizedException('Token reutilizado, sessão revogada por segurança');
+      throw new UnauthorizedException(
+        'Token reutilizado, sessão revogada por segurança',
+      );
     }
 
     if (stored.expiresAt < new Date()) {

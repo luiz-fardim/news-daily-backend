@@ -2,9 +2,10 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './modules/auth/auth.module';
 import configuration from './config/configuration';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { AllExceptionsFilter } from './common/filters/http-exception.filter'; 
-import { ThrottlerModule } from '@nestjs/throttler'
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
+import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
@@ -22,12 +23,17 @@ import { ThrottlerModule } from '@nestjs/throttler'
       load: [configuration],
     }),
     AuthModule,
+    UsersModule
   ],
   controllers: [],
   providers: [
     {
       provide: APP_FILTER,
       useClass: AllExceptionsFilter
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
     }
   ],
 })
