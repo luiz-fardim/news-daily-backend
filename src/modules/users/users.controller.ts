@@ -1,10 +1,11 @@
-import { Controller, Get, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Body, Patch, Param, Delete, UseGuards, ParseIntPipe } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Roles } from 'src/guards/roles/decorators/roles.decorator';
 import { Role } from 'src/generated/prisma/browser';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/guards/roles/roles.guard';
+import { CurrentUser } from 'src/guards/roles/decorators/user.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -17,9 +18,13 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.usersService.findOne(id);
+  findOne(
+    @Param('id', ParseIntPipe) id: number, 
+    @CurrentUser('id') requestUserId: string
+  ) {
+    return this.usersService.findOne(id, Number(requestUserId));
   }
 
   @Patch(':id')

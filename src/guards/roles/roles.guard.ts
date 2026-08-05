@@ -20,10 +20,8 @@ export class RolesGuard implements CanActivate {
     }
 
     const { user } = context.switchToHttp().getRequest();
-    console.log(user)
     // user.role vem do que o JwtStrategy.validate() retornou
-    const response = requiredRoles.includes(user?.role);
-    console.log(response)
+    const response = requiredRoles.includes(user?.role); 
     return response
   }
 }

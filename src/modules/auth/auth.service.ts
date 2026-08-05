@@ -38,7 +38,6 @@ export class AuthService {
       data: {
         ...data,
         birthday: new Date(data.birthday),
-        role: Role.ADMIN
       },
     });
     const { password, ...userWithoutPassword } = user;

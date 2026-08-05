@@ -5,6 +5,6 @@ export class LoginAuthDto {
     @Length(8, 30)
     email: string
 
-    @Length(8, 12)
+    @Length(8, 20)
     password: string
 }

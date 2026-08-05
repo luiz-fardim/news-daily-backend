@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma.service';
 
@@ -11,12 +11,16 @@ export class UsersService {
     return this.prismaService.user.findMany();
   }
 
-  async findOne(id: number) {
+  async findOne(id: number, requestUserId: number) {
   const user = await this.prismaService.user.findUnique({
     where: { id },
   });
   if (!user) {
     throw new NotFoundException(`User with ID ${id} not found`);
+  }
+  console.log(user.id, requestUserId)
+  if (user.id !== requestUserId) {
+    throw new ForbiddenException("You can't access here");
   }
   return user;
 }
