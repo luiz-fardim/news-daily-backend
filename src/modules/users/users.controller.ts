@@ -27,13 +27,21 @@ export class UsersController {
     return this.usersService.findOne(id, Number(requestUserId));
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  update(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(id, updateUserDto);
+  update(
+    @Param('id', ParseIntPipe) id: number, 
+    @CurrentUser('id') requestUserId: string,
+    @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.update(id, updateUserDto, Number(requestUserId));
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: number) {
-    return this.usersService.remove(id);
+  remove(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser('id') requestUserId: string  
+  ) {
+    return this.usersService.remove(id, Number(requestUserId));
   }
 }
