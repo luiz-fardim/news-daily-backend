@@ -38,7 +38,7 @@ model RefreshToken {
 
 model Plan {
   id                     Int             @id @default(autoincrement())
-  name                   Name
+  name                   String          @unique
   price                  Decimal         @db.Decimal(10, 2)
   billing_interval       BillingInterval
   billing_interval_count Int             @default(1)
@@ -64,17 +64,11 @@ model Subscription {
 enum Role {
   USER
   ADMIN
-}
-
-enum Name {
-  BRIEF
-  INSIDE
-  ELITE
-}
+} 
 
 enum BillingInterval {
-  MONTH
-  YEAR
+  WEEKLY
+  MONTHLY
 }
 
 enum SubscriptionStatus {

@@ -6,6 +6,7 @@ import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { AllExceptionsFilter } from './common/filters/http-exception.filter'; 
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
 import { UsersModule } from './modules/users/users.module';
+import { PlansModule } from './modules/plans/plans.module';
 
 @Module({
   imports: [
@@ -23,7 +24,8 @@ import { UsersModule } from './modules/users/users.module';
       load: [configuration],
     }),
     AuthModule,
-    UsersModule
+    UsersModule,
+    PlansModule
   ],
   controllers: [],
   providers: [
