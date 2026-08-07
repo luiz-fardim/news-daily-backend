@@ -2,7 +2,7 @@
 
 <p align="center">
 
-![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=for-the-badge&logo=nestjs&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)
@@ -15,7 +15,7 @@
 </p>
 
 <p align="center">
-  <strong>Plataforma de assinaturas que envia as principais notícias diretamente por e-mail</strong>, construída com Node.js, TypeScript, Prisma e PostgreSQL.
+  <strong>Plataforma de assinaturas que envia as principais notícias diretamente por e-mail</strong>, construída com NestJS, TypeScript, Prisma e PostgreSQL.
 </p>
 
 <p align="center">
@@ -26,30 +26,36 @@
 
 ## 💡 Sobre o projeto
 
-Muita gente não tem tempo de acompanhar as notícias diariamente. O **NewsClub** resolve isso: o usuário assina um plano e passa a receber, por e-mail, um resumo das principais notícias reunidas de fontes confiáveis — sem precisar sair procurando.
+Muita gente não tem tempo de acompanhar as notícias diariamente. O **NewsDaily** resolve isso: o usuário assina um plano e passa a receber, por e-mail, um resumo das principais notícias reunidas de fontes confiáveis, sem precisar sair procurando.
 
 O produto foi pensado para pessoas com rotina corrida que querem se manter informadas de forma automática. A ideia central: cada plano tem uma frequência diferente de envio (ex.: resumo semanal, três vezes por semana, ou diário), o que é o principal diferencial em relação a uma newsletter genérica.
 
-**Status atual:** o projeto está no início. Até agora já foram feitos:
+**Status atual:** o projeto está no início, mas já com boa parte da base construída. Até agora já foram feitos:
 - ✅ Modelagem do banco de dados (`schema.prisma`)
 - ✅ Conexão com o banco de dados
 - ✅ Rota de registro de usuário (`POST /auth/signup`)
 - ✅ Rota de login do usuário (`POST /auth/signin`)
+- ✅ Rotas de usuários, planos e assinaturas (CRUD)
+- ✅ RBAC (controle de acesso por papel — usuário/admin)
+- ✅ Pipes globais de validação
 
-Todo o restante (assinaturas, pagamento, envio de e-mail, filas, etc.) está planejado e detalhado no roadmap abaixo.
+Todo o restante (pagamento, envio de e-mail, filas, etc.) está planejado e detalhado no roadmap abaixo.
 
 ---
 
 ## 🚀 Tecnologias
 
 ### Já em uso
-- 🟢 Node.js + TypeScript
+- ⚡ NestJS
+- 🟦 TypeScript
 - 🐘 PostgreSQL
 - 🔗 Prisma ORM
+- 🔑 JWT — autenticação
+- 🛡️ RBAC — controle de acesso por papel (Guards)
+- ✅ Pipes globais de validação (`ValidationPipe`)
 
 ### Planejadas
-- 🔑 JWT + OAuth2 — autenticação
-- 🔒 Argon2 — criptografia de senha
+- 🔐 OAuth2
 - 🐳 Docker
 - 🧠 Redis (ou node-cache) — cache
 - 📬 BullMQ — filas para envio assíncrono de e-mail
@@ -61,21 +67,30 @@ Todo o restante (assinaturas, pagamento, envio de e-mail, filas, etc.) está pla
 ## ✨ Funcionalidades
 
 ### ✅ Feito até agora
-- Cadastro de usuário (`POST /auth/register`)
+
+**Autenticação**
+- Cadastro de usuário (`POST /auth/signup`)
+- Login com JWT (`POST /auth/signin`)
+- Renovação de access token (`/auth/refresh`)
+
+**Usuários**
+- Listagem, busca por ID, atualização e remoção de usuários (`/users`)
+
+**Planos**
+- Listagem, busca por ID, criação, edição e desativação de planos (`/plans`)
+
+**Assinaturas**
+- Criação, listagem, consulta de status, troca de plano e cancelamento de assinatura (`/subscriptions`)
+
+**Segurança & Infraestrutura**
+- RBAC, rotas administrativas protegidas por papel (admin)
+- Pipes globais de validação de dados de entrada
 
 ### 🔜 Planejado
 
 **Usuário**
-- [x] Login (JWT)
-- [ ] Escolher plano de assinatura
 - [ ] Efetuar pagamento
-- [ ] Visualizar assinatura
-- [ ] Cancelar assinatura
 - [ ] Solicitar reembolso (até 15 dias)
-
-**Administrador**
-- [ ] Criar, editar e desativar planos
-- [ ] Visualizar assinantes ativos
 
 **Sistema**
 - [ ] Envio diário de newsletter aos assinantes ativos
@@ -92,6 +107,7 @@ Todo o restante (assinaturas, pagamento, envio de e-mail, filas, etc.) está pla
 - Plano nunca é excluído, apenas desativado (`is_active: false`)
 - Envio de e-mail deve ser **idempotente** (evitar duplicidade)
 - Cada plano tem uma frequência própria de envio
+- Rotas administrativas (gestão de planos, listagem de assinantes) exigem papel `admin`
 
 ---
 
@@ -102,7 +118,7 @@ Todo o restante (assinaturas, pagamento, envio de e-mail, filas, etc.) está pla
 | Entidade         | Principais campos                                                                 |
 | ------------------ | ------------------------------------------------------------------------------------ |
 | **User**          | `id`, `first_name`, `last_name`, `birth`, `email (unique)`, `password (argon2)`, `role`, `stripe_customer_id` |
-| **Plan**          | `id`, `name (brief/insider/elite)`, `price`, `billing_interval`, `is_active`         |
+| **Plan**          | `id`, `name `, `price`, `billing_interval`, `is_active`         |
 | **Subscription**  | `id`, `user_id`, `plan_id`, `started_at`, `expires_at`, `price_at_signing`, `status`, `stripe_subscription_id`, `canceled_at` |
 | **Payment**       | `id`, `user_id`, `plan_id`, `subscription_id`, `method`, `value`, `status`, `currency`, `stripe_payment_intent_id` |
 | **EmailLog**      | `id`, `user_id`, `subscription_id`, `status`, `provider_message_id`, `sent_at`       |
@@ -151,6 +167,7 @@ Todo o restante (assinaturas, pagamento, envio de e-mail, filas, etc.) está pla
 ├── tsconfig.build.json
 └── tsconfig.json
 ```
+
 ---
 
 ## ⚙️ Como executar
@@ -165,13 +182,13 @@ Todo o restante (assinaturas, pagamento, envio de e-mail, filas, etc.) está pla
 
 ```bash
 git clone https://github.com/seu-usuario/newsclub-api.git
-cd newsclub-api
+cd newsdaily-api
 ```
 
 ### Instale as dependências
 
 ```bash
-npm install
+pnpm install
 ```
 
 ### Configure as variáveis de ambiente
@@ -195,12 +212,12 @@ npx prisma generate
 ### Suba o servidor
 
 ```bash
-npm run dev
+pnpm run start:dev
 ```
 
 ---
 
-## 📡 Endpoints planejados
+## 📡 Endpoints
 
 > Legenda: ✅ implementado · 🔜 planejado
 
@@ -208,38 +225,38 @@ npm run dev
 
 | Status | Método | Rota             | Descrição                          |
 | :----: | ------ | ----------------- | ------------------------------------- |
-| ✅     | POST   | `/auth/signup`  | Cadastro (first_name, last_name, birthday, email e password)         |
-| ✅     | POST   | `/auth/signin`      | Login, retorna JWT                    |
-| 🔜     | POST   | `/auth/refresh`    | Renova o access token                 |
+| ✅     | POST   | `/auth/signup`     | Cadastro (first_name, last_name, birthday, email e password) |
+| ✅     | POST   | `/auth/signin`     | Login, retorna JWT                    |
+| ✅     | POST   | `/auth/refresh`    | Renova o access token                 |
 
 ### Users
 
 | Status | Método | Rota          | Descrição                    | Auth               |
 | :----: | ------ | -------------- | ------------------------------- | -------------------- |
-| 🔜     | GET    | `/users/`      | Lista todos                     | JWT + Role (admin)  |
-| 🔜     | GET    | `/users/:id`   | Busca um usuário                | JWT (dono ou admin) |
-| 🔜     | PATCH  | `/users/:id`   | Atualiza usuário                | JWT (dono ou admin) |
-| 🔜     | DELETE | `/users/:id`   | Remove usuário                  | JWT (dono ou admin) |
+| ✅     | GET    | `/users/`      | Lista todos                     | JWT + RBAC (admin)  |
+| ✅     | GET    | `/users/:id`   | Busca um usuário                | JWT (dono ou admin) |
+| ✅     | PATCH  | `/users/:id`   | Atualiza usuário                | JWT (dono ou admin) |
+| ✅     | DELETE | `/users/:id`   | Remove usuário                  | JWT (dono ou admin) |
 
 ### Plans
 
-| Status | Método | Rota          | Descrição                | Auth        |
-| :----: | ------ | -------------- | --------------------------- | ------------- |
-| 🔜     | GET    | `/plans`       | Lista planos disponíveis    | Público      |
-| 🔜     | GET    | `/plans/:id`   | Detalhe de um plano         | Público      |
-| 🔜     | POST   | `/plans`       | Cria plano                  | JWT + admin  |
-| 🔜     | PATCH  | `/plans/:id`   | Edita plano                 | JWT + admin  |
-| 🔜     | DELETE | `/plans/:id`   | Remove (desativa) plano     | JWT + admin  |
+| Status | Método | Rota          | Descrição                | Auth              |
+| :----: | ------ | -------------- | --------------------------- | ------------------- |
+| ✅     | GET    | `/plans`       | Lista planos disponíveis    | Público            |
+| ✅     | GET    | `/plans/:id`   | Detalhe de um plano         | Público            |
+| ✅     | POST   | `/plans`       | Cria plano                  | JWT + RBAC (admin) |
+| ✅     | PATCH  | `/plans/:id`   | Edita plano                 | JWT + RBAC (admin) |
+| ✅     | DELETE | `/plans/:id`   | Remove (desativa) plano     | JWT + RBAC (admin) |
 
 ### Subscription
 
-| Status | Método | Rota                | Descrição                    |
-| :----: | ------ | --------------------- | -------------------------------- |
-| 🔜     | POST   | `/subscription`       | Cria assinatura                  |
-| 🔜     | GET    | `/subscription`       | Lista todas (admin)              |
-| 🔜     | GET    | `/subscription/:id`   | Verifica status da assinatura    |
-| 🔜     | PATCH  | `/subscription/:id`   | Muda de plano                    |
-| 🔜     | DELETE | `/subscription/:id`   | Cancela assinatura               |
+| Status | Método | Rota                | Descrição                    | Auth               |
+| :----: | ------ | --------------------- | -------------------------------- | -------------------- |
+| ✅     | POST   | `/subscription`       | Cria assinatura                  | JWT                  |
+| ✅     | GET    | `/subscription`       | Lista todas                      | JWT + RBAC (admin)  |
+| ✅     | GET    | `/subscription/:id`   | Verifica status da assinatura    | JWT (dono ou admin) |
+| ✅     | PATCH  | `/subscription/:id`   | Muda de plano                    | JWT (dono ou admin) |
+| ✅     | DELETE | `/subscription/:id`   | Cancela assinatura               | JWT (dono ou admin) |
 
 ### Payment
 
@@ -253,9 +270,9 @@ npm run dev
 
 ### Admin
 
-| Status | Método | Rota                  | Descrição                     |
-| :----: | ------ | ----------------------- | --------------------------------- |
-| 🔜     | GET    | `/admin/signatures`     | Lista assinantes ativos           |
+| Status | Método | Rota                  | Descrição                     | Auth               |
+| :----: | ------ | ----------------------- | --------------------------------- | -------------------- |
+| 🔜     | GET    | `/admin/signatures`     | Lista assinantes ativos           | JWT + RBAC (admin)  |
 
 ---
 
@@ -267,10 +284,13 @@ npm run dev
 - [ ] Estados e transições da assinatura documentados
 
 ### Etapa 2 — API base (sem Stripe, sem e-mail, tudo fake)
-- [x] Registro de usuário
-- [ ] Login e refresh token
-- [ ] CRUD de planos
-- [ ] CRUD de assinaturas
+- [x] Registro e login de usuário
+- [x] CRUD de usuários
+- [x] CRUD de planos
+- [x] CRUD de assinaturas
+- [x] RBAC (controle de acesso por papel)
+- [x] Pipes globais de validação
+- [x] Refresh token
 - [ ] Pagamento fake
 
 ### Etapa 3 — Stripe
