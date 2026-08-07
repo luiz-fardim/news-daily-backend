@@ -7,6 +7,7 @@ import { AllExceptionsFilter } from './common/filters/http-exception.filter';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
 import { UsersModule } from './modules/users/users.module';
 import { PlansModule } from './modules/plans/plans.module';
+import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
 
 @Module({
   imports: [
@@ -25,7 +26,8 @@ import { PlansModule } from './modules/plans/plans.module';
     }),
     AuthModule,
     UsersModule,
-    PlansModule
+    PlansModule,
+    SubscriptionsModule
   ],
   controllers: [],
   providers: [
