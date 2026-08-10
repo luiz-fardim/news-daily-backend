@@ -7,8 +7,21 @@ export class UsersService {
   constructor(
     private readonly prismaService: PrismaService,
   ) {}
-  findAll() {
-    return this.prismaService.user.findMany();
+  async findAll(page = 1, limit = 10) {
+    const take = limit;
+    const skip = (page - 1) * limit;
+    const [data, total] = await Promise.all([
+      this.prismaService.user.findMany({ skip, take }),
+      this.prismaService.user.count(),
+    ]);
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        last_page: Math.ceil(total / limit),
+      },
+    };
   }
 
   async findOne(id: number, requestUserId: number) {
