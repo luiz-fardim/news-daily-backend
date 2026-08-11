@@ -1,20 +1,20 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
 
 describe('AuthController', () => {
-  let controller: AuthController;
+  const mockService = { create: jest.fn(), compare: jest.fn() };
+  const controller = new AuthController(mockService as any);
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [AuthController],
-      providers: [AuthService],
-    }).compile();
-
-    controller = module.get<AuthController>(AuthController);
+  it('signup should call authService.create and return value', async () => {
+    mockService.create.mockResolvedValue({ id: 1, email: 'a@b.com' });
+    const out = await controller.signup({ email: 'a@b.com', password: '123' } as any);
+    expect(mockService.create).toHaveBeenCalled();
+    expect(out).toEqual({ id: 1, email: 'a@b.com' });
   });
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
+  it('signin should call authService.compare and return tokens', async () => {
+    mockService.compare.mockResolvedValue({ accessToken: 'a', refreshToken: 'b' });
+    const out = await controller.signin({ email: 'a@b.com', password: '123' } as any);
+    expect(mockService.compare).toHaveBeenCalled();
+    expect(out).toEqual({ accessToken: 'a', refreshToken: 'b' });
   });
 });
