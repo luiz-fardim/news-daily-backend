@@ -17,8 +17,9 @@ export class UsersController {
   findAll(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Query('subscriptionStatus') subscriptionStatus?: string,
   ) {
-    return this.usersService.findAll(page, limit);
+    return this.usersService.findAll(page, limit, subscriptionStatus);
   }
 
   @UseGuards(JwtAuthGuard)

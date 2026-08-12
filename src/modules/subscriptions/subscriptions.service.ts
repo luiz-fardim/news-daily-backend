@@ -6,6 +6,7 @@ import {
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
 import { PrismaService } from 'src/prisma.service';
+import { SubscriptionStatus } from 'src/generated/prisma/enums';
 
 @Injectable()
 export class SubscriptionsService {
@@ -68,22 +69,26 @@ export class SubscriptionsService {
     return result;
   }
 
-  async findAll(page = 1, limit = 10) {
-    const take = limit;
-    const skip = (page - 1) * limit;
-    const [data, total] = await Promise.all([
-      this.prismaService.subscription.findMany({ skip, take }),
-      this.prismaService.subscription.count(),
-    ]);
-    return {
-      data,
-      meta: {
-        total,
-        page,
-        last_page: Math.ceil(total / limit),
-      },
-    };
-  }
+  async findAll(page = 1, limit = 10, statusQuery: SubscriptionStatus) {
+  const take = limit;
+  const skip = (page - 1) * limit;
+
+  const where = { status: statusQuery };
+
+  const [data, total] = await Promise.all([
+    this.prismaService.subscription.findMany({ skip, take, where }),
+    this.prismaService.subscription.count({ where }),
+  ]);
+
+  return {
+    data,
+    meta: {
+      total,
+      page,
+      last_page: Math.ceil(total / limit),
+    },
+  };
+}
 
   findOne(id: number) {
     return `This action returns a #${id} subscription`;

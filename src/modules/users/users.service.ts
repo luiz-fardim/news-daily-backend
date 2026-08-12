@@ -1,18 +1,19 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma.service';
+import { SubscriptionStatus } from 'src/generated/prisma/browser';
 
 @Injectable()
 export class UsersService {
   constructor(
     private readonly prismaService: PrismaService,
   ) {}
-  async findAll(page = 1, limit = 10) {
+  async findAll(page = 1, limit = 10, subscriptionStatus?: string) {
     const take = limit;
     const skip = (page - 1) * limit;
     const [data, total] = await Promise.all([
       this.prismaService.user.findMany({ skip, take }),
-      this.prismaService.user.count(),
+      this.prismaService.user.count()
     ]);
     return {
       data,
