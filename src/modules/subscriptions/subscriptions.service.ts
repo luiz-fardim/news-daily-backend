@@ -90,15 +90,28 @@ export class SubscriptionsService {
   };
 }
 
-  findOne(id: number) {
-    return `This action returns a #${id} subscription`;
+  async findOne(id: number) {
+    return await this.prismaService.subscription.findUnique({
+      where: { id }
+    })
   }
 
-  update(id: number, updateSubscriptionDto: UpdateSubscriptionDto) {
-    return `This action updates a #${id} subscription`;
+  async update(id: number, updateSubscriptionDto: UpdateSubscriptionDto) {
+    return await this.prismaService.subscription.update({
+      where: { id },
+      data: { 
+        ...updateSubscriptionDto,
+        plan_id: updateSubscriptionDto.plan_id
+       }
+    })
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} subscription`;
+  async remove(id: number) {
+    return await this.prismaService.subscription.update({
+      where: { id },
+      data: {
+        status: SubscriptionStatus.CANCELED
+      } 
+    })
   }
 }
