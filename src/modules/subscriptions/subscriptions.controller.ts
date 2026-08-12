@@ -1,11 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, ParseIntPipe, Query, DefaultValuePipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, ParseIntPipe, Query, DefaultValuePipe, ParseEnumPipe } from '@nestjs/common';
 import { SubscriptionsService } from './subscriptions.service';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/guards/roles/roles.guard';
 import { Roles } from 'src/guards/roles/decorators/roles.decorator';
-import { Role } from 'src/generated/prisma/enums';
+import { Role, SubscriptionStatus } from 'src/generated/prisma/enums';
 
 @Controller('subscriptions')
 export class SubscriptionsController {
@@ -26,8 +26,10 @@ export class SubscriptionsController {
   findAll(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Query('statusQuery', new DefaultValuePipe(SubscriptionStatus.ACTIVE), new ParseEnumPipe(SubscriptionStatus)) 
+    statusQuery: SubscriptionStatus
   ) {
-    return this.subscriptionsService.findAll(page, limit);
+    return this.subscriptionsService.findAll(page, limit, statusQuery);
   }
 
   @UseGuards(JwtAuthGuard)
