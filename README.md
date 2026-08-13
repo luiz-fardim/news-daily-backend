@@ -83,7 +83,7 @@ npx prisma generate
 pnpm run start:dev
 ```
 
-## 👨‍💻 Autor
+## Autor
 
 Desenvolvido por **Luiz**, como projeto de estudo avançado envolvendo modelagem de dados, pagamentos recorrentes, filas e observabilidade — um passo além dos projetos anteriores.
 
