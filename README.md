@@ -1,4 +1,4 @@
-# 📰 NewsClub API
+# news-daily API
 
 <p align="center">
 
@@ -14,181 +14,35 @@
 
 </p>
 
-<p align="center">
-  <strong>Plataforma de assinaturas que envia as principais notícias diretamente por e-mail</strong>, construída com NestJS, TypeScript, Prisma e PostgreSQL.
-</p>
+Plataforma de assinaturas que envia as principais notícias por e-mail, construída com NestJS, TypeScript, Prisma e PostgreSQL.
 
-<p align="center">
-  <i>🚧 Projeto em fase inicial de desenvolvimento — este README também serve como documentação viva do planejamento.</i>
-</p>
+## Objetivo
 
----
+Muita gente não tem tempo de acompanhar notícias diariamente. O news-daily resolve isso: o usuário assina um plano e recebe por e-mail um resumo das principais notícias, sem precisar procurar.
 
-## 💡 Sobre o projeto
-
-Muita gente não tem tempo de acompanhar as notícias diariamente. O **NewsDaily** resolve isso: o usuário assina um plano e passa a receber, por e-mail, um resumo das principais notícias reunidas de fontes confiáveis, sem precisar sair procurando.
-
-O produto foi pensado para pessoas com rotina corrida que querem se manter informadas de forma automática. A ideia central: cada plano tem uma frequência diferente de envio (ex.: resumo semanal, três vezes por semana, ou diário), o que é o principal diferencial em relação a uma newsletter genérica.
-
-**Status atual:** o projeto está no início, mas já com boa parte da base construída. Até agora já foram feitos:
-- ✅ Modelagem do banco de dados (`schema.prisma`)
-- ✅ Conexão com o banco de dados
-- ✅ Rota de registro de usuário (`POST /auth/signup`)
-- ✅ Rota de login do usuário (`POST /auth/signin`)
-- ✅ Rotas de usuários, planos e assinaturas (CRUD)
-- ✅ RBAC (controle de acesso por papel — usuário/admin)
-- ✅ Pipes globais de validação
-
-Todo o restante (pagamento, envio de e-mail, filas, etc.) está planejado e detalhado no roadmap abaixo.
+Cada plano tem uma frequência de envio diferente (semanal, três vezes por semana ou diário), que é o principal diferencial em relação a uma newsletter genérica.
 
 ---
 
-## 🚀 Tecnologias
+## Stack
 
-### Já em uso
-- ⚡ NestJS
-- 🟦 TypeScript
-- 🐘 PostgreSQL
-- 🔗 Prisma ORM
-- 🔑 JWT — autenticação
-- 🛡️ RBAC — controle de acesso por papel (Guards)
-- ✅ Pipes globais de validação (`ValidationPipe`)
-
-### Planejadas
-- 🔐 OAuth2
-- 🐳 Docker
-- 🧠 Redis (ou node-cache) — cache
-- 📬 BullMQ — filas para envio assíncrono de e-mail
-- 💳 Stripe — pagamentos e assinaturas
-- 📊 Logs estruturados + observabilidade
+NestJS, TypeScript, PostgreSQL, Prisma, JWT, Docker
 
 ---
 
-## ✨ Funcionalidades
-
-### ✅ Feito até agora
-
-**Autenticação**
-- Cadastro de usuário (`POST /auth/signup`)
-- Login com JWT (`POST /auth/signin`)
-- Renovação de access token (`/auth/refresh`)
-
-**Usuários**
-- Listagem, busca por ID, atualização e remoção de usuários (`/users`)
-
-**Planos**
-- Listagem, busca por ID, criação, edição e desativação de planos (`/plans`)
-
-**Assinaturas**
-- Criação, listagem, consulta de status, troca de plano e cancelamento de assinatura (`/subscriptions`)
-
-**Segurança & Infraestrutura**
-- RBAC, rotas administrativas protegidas por papel (admin)
-- Pipes globais de validação de dados de entrada
-
-### 🔜 Planejado
-
-**Usuário**
-- [ ] Efetuar pagamento
-- [ ] Solicitar reembolso (até 15 dias)
-
-**Sistema**
-- [ ] Envio diário de newsletter aos assinantes ativos
-- [ ] Idempotência no envio de e-mail
-- [ ] Frequência de envio por plano (brief semanal, insider seg/qua/sex, elite diário)
-
----
-
-## 📊 Regras de Negócio
-
-- Um usuário só pode ter **uma assinatura ativa por vez**
-- Pagamento em dia = recebe notícia
-- Reembolso solicitado em até 15 dias **cancela a assinatura imediatamente**
-- Plano nunca é excluído, apenas desativado (`is_active: false`)
-- Envio de e-mail deve ser **idempotente** (evitar duplicidade)
-- Cada plano tem uma frequência própria de envio
-- Rotas administrativas (gestão de planos, listagem de assinantes) exigem papel `admin`
-
----
-
-## 🗂️ Modelagem de Dados
-
-### Entidades
-
-| Entidade         | Principais campos                                                                 |
-| ------------------ | ------------------------------------------------------------------------------------ |
-| **User**          | `id`, `first_name`, `last_name`, `birth`, `email (unique)`, `password (argon2)`, `role`, `stripe_customer_id` |
-| **Plan**          | `id`, `name `, `price`, `billing_interval`, `is_active`         |
-| **Subscription**  | `id`, `user_id`, `plan_id`, `started_at`, `expires_at`, `price_at_signing`, `status`, `stripe_subscription_id`, `canceled_at` |
-| **Payment**       | `id`, `user_id`, `plan_id`, `subscription_id`, `method`, `value`, `status`, `currency`, `stripe_payment_intent_id` |
-| **EmailLog**      | `id`, `user_id`, `subscription_id`, `status`, `provider_message_id`, `sent_at`       |
-
-### Relacionamentos
-
-- `User` → `Subscription` — **1:N** (um usuário pode assinar planos diferentes ao longo do tempo)
-- `Plan` → `Subscription` — **1:N** (resolve o N:N entre `User` e `Plan`)
-- `User` → `Payment` — **1:N**
-- `Subscription` → `Payment` — **1:N**
-- `User` → `EmailLog` — **1:N**
-- `Subscription` → `EmailLog` — **1:N**
-
----
-
-## 📂 Estrutura do Projeto
-
-```text
-├── .agents
-├── .claude
-├── .windsurf
-├── dist
-├── node_modules
-├── prisma
-├── src
-│   ├── config
-│   ├── database
-│   ├── generated
-│   ├── modules
-│   ├── utils
-│   ├── app.module.ts
-│   ├── main.ts
-│   └── prisma.service.ts
-├── test
-├── .env
-├── .gitignore
-├── .prettierrc
-├── docker-compose.yml
-├── eslint.config.mjs
-├── nest-cli.json
-├── package.json
-├── pnpm-lock.yaml
-├── prisma.config.ts
-├── README.md
-├── skills-lock.json
-├── tsconfig.build.json
-└── tsconfig.json
-```
-
----
-
-## ⚙️ Como executar
+## Como executar
 
 ### Pré-requisitos
 
 - Node.js 18+
-- PostgreSQL
-- Docker (opcional, recomendado)
+- pnpm
+- Docker
 
 ### Clone o projeto
 
 ```bash
 git clone https://github.com/seu-usuario/newsclub-api.git
-cd newsdaily-api
-```
-
-### Instale as dependências
-
-```bash
-pnpm install
+cd newsclub-api
 ```
 
 ### Configure as variáveis de ambiente
@@ -200,6 +54,20 @@ DATABASE_URL="postgresql://usuario:senha@localhost:5432/newsclub"
 JWT_SECRET="sua_chave_secreta"
 JWT_REFRESH_SECRET="sua_chave_secreta_de_refresh"
 PORT=3000
+POSTGRES_USER="seu_usuario"
+POSTGRES_PASSWORD="sua_senha"
+```
+
+### Instale as dependências
+
+```bash
+pnpm install
+```
+
+### Suba os containers
+
+```bash
+docker compose up -d
 ```
 
 ### Rode as migrations e gere o cliente Prisma
@@ -214,115 +82,6 @@ npx prisma generate
 ```bash
 pnpm run start:dev
 ```
-
----
-
-## 📡 Endpoints
-
-> Legenda: ✅ implementado · 🔜 planejado
-
-### Auth
-
-| Status | Método | Rota             | Descrição                          |
-| :----: | ------ | ----------------- | ------------------------------------- |
-| ✅     | POST   | `/auth/signup`     | Cadastro (first_name, last_name, birthday, email e password) |
-| ✅     | POST   | `/auth/signin`     | Login, retorna JWT                    |
-| ✅     | POST   | `/auth/refresh`    | Renova o access token                 |
-
-### Users
-
-| Status | Método | Rota          | Descrição                    | Auth               |
-| :----: | ------ | -------------- | ------------------------------- | -------------------- |
-| ✅     | GET    | `/users/`      | Lista todos                     | JWT + RBAC (admin)  |
-| ✅     | GET    | `/users/:id`   | Busca um usuário                | JWT (dono ou admin) |
-| ✅     | PATCH  | `/users/:id`   | Atualiza usuário                | JWT (dono ou admin) |
-| ✅     | DELETE | `/users/:id`   | Remove usuário                  | JWT (dono ou admin) |
-
-### Plans
-
-| Status | Método | Rota          | Descrição                | Auth              |
-| :----: | ------ | -------------- | --------------------------- | ------------------- |
-| ✅     | GET    | `/plans`       | Lista planos disponíveis    | Público            |
-| ✅     | GET    | `/plans/:id`   | Detalhe de um plano         | Público            |
-| ✅     | POST   | `/plans`       | Cria plano                  | JWT + RBAC (admin) |
-| ✅     | PATCH  | `/plans/:id`   | Edita plano                 | JWT + RBAC (admin) |
-| ✅     | DELETE | `/plans/:id`   | Remove (desativa) plano     | JWT + RBAC (admin) |
-
-### Subscription
-
-| Status | Método | Rota                | Descrição                    | Auth               |
-| :----: | ------ | --------------------- | -------------------------------- | -------------------- |
-| ✅     | POST   | `/subscription`       | Cria assinatura                  | JWT                  |
-| ✅     | GET    | `/subscription`       | Lista todas                      | JWT + RBAC (admin)  |
-| ✅     | GET    | `/subscription/:id`   | Verifica status da assinatura    | JWT (dono ou admin) |
-| ✅     | PATCH  | `/subscription/:id`   | Muda de plano                    | JWT (dono ou admin) |
-| ✅     | DELETE | `/subscription/:id`   | Cancela assinatura               | JWT (dono ou admin) |
-
-### Payment
-
-| Status | Método | Rota                 | Descrição                                          |
-| :----: | ------ | ---------------------- | ------------------------------------------------------ |
-| 🔜     | POST   | `/payment`             | Simula pagamento (fake, fase inicial)                  |
-| 🔜     | POST   | `/payment/checkout`    | Cria Stripe Checkout Session                            |
-| 🔜     | POST   | `/payment/webhook`     | Recebe eventos do Stripe (auth via assinatura Stripe)   |
-| 🔜     | GET    | `/payment/:id`         | Consulta status de um pagamento                         |
-| 🔜     | GET    | `/payment`             | Lista pagamentos do usuário (ou todos, se admin)        |
-
-### Admin
-
-| Status | Método | Rota                  | Descrição                     | Auth               |
-| :----: | ------ | ----------------------- | --------------------------------- | -------------------- |
-| 🔜     | GET    | `/admin/signatures`     | Lista assinantes ativos           | JWT + RBAC (admin)  |
-
----
-
-## 🔮 Roadmap
-
-### Etapa 1 — Modelagem
-- [x] Relacionamentos e schema (`schema.prisma`)
-- [x] Conexão com banco de dados
-- [ ] Estados e transições da assinatura documentados
-
-### Etapa 2 — API base (sem Stripe, sem e-mail, tudo fake)
-- [x] Registro e login de usuário
-- [x] CRUD de usuários
-- [x] CRUD de planos
-- [x] CRUD de assinaturas
-- [x] RBAC (controle de acesso por papel)
-- [x] Pipes globais de validação
-- [x] Refresh token
-- [ ] Pagamento fake
-
-### Etapa 3 — Stripe
-- [ ] Checkout Session
-- [ ] Webhooks
-- [ ] Assinaturas recorrentes
-
-### Etapa 4 — Envio de e-mail
-- [ ] Integração com provedor de e-mail (AWS)
-- [ ] Templates HTML
-
-### Etapa 5 — Redis
-- [ ] Cache básico
-- [ ] Pub/sub
-
-### Etapa 6 — BullMQ
-- [ ] Jobs e workers
-- [ ] Retries e delayed jobs
-- [ ] Controle de concorrência
-
-### Etapa 7 — Observabilidade
-- [ ] Logs estruturados
-- [ ] Métricas
-- [ ] Health checks
-
----
-
-## 📝 Licença
-
-Este projeto está sob a licença **MIT**.
-
----
 
 ## 👨‍💻 Autor
 
