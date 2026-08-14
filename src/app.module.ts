@@ -8,6 +8,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
 import { UsersModule } from './modules/users/users.module';
 import { PlansModule } from './modules/plans/plans.module';
 import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
+import { PaymentsModule } from './payments/payments.module';
 
 @Module({
   imports: [
@@ -27,7 +28,8 @@ import { SubscriptionsModule } from './modules/subscriptions/subscriptions.modul
     AuthModule,
     UsersModule,
     PlansModule,
-    SubscriptionsModule
+    SubscriptionsModule,
+    PaymentsModule
   ],
   controllers: [],
   providers: [

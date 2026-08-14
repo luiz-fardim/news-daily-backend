@@ -87,4 +87,4 @@ pnpm run start:dev
 
 Desenvolvido por **Luiz**, como projeto de estudo avançado envolvendo modelagem de dados, pagamentos recorrentes, filas e observabilidade — um passo além dos projetos anteriores.
 
-Sugestões, ideias ou vontade de contribuir? Fique à vontade para abrir uma **Issue** ou enviar um **Pull Request**. 🚀
+Sugestões, ideias ou vontade de contribuir? Fique à vontade para abrir uma **Issue** ou enviar um **Pull Request**. 

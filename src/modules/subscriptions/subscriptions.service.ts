@@ -50,7 +50,7 @@ export class SubscriptionsService {
         ...data,
         user_id: user.id,
         plan_id: plan.id,
-        expires_at: this.calculateExpiresAt(),
+        expires_at: this.calculateExpiresAt() 
       },
     });
 
