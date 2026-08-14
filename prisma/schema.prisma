@@ -52,13 +52,28 @@ model Subscription {
   plan                   Plan               @relation(fields: [plan_id], references: [id])
   plan_id                Int
   price_at_signing       Decimal            @db.Decimal(10, 2)
-  status                 SubscriptionStatus @default(ACTIVE)
+  status                 SubscriptionStatus @default(PENDING)
   stripe_subscription_id String?            @unique
   started_at             DateTime           @default(now())
   expires_at             DateTime
   canceled_at            DateTime?
   created_at             DateTime           @default(now())
   updated_at             DateTime           @updatedAt
+  payments Payment[]
+}
+
+model Payment {
+  id                Int          @id @default(autoincrement())
+  subscription      Subscription    @relation(fields: [subscription_id], references: [id])
+  subscription_id   Int
+  method            MethodEnum
+  amount            Int
+  currency          String          @default("brl")
+  status            PaymentStatus   @default(PENDING)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@index([subscription_id])
 }
 
 enum Role {
@@ -76,4 +91,19 @@ enum SubscriptionStatus {
   CANCELED
   EXPIRED
   PAST_DUE
+  PENDING
+}
+
+enum MethodEnum {
+    PIX
+    DEBIT_CARD
+    CREDIT_CARD
+}
+
+enum PaymentStatus {
+  PENDING
+  APPROVED
+  DECLINED
+  CANCELED
+  REFUNDED
 }
