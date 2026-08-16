@@ -11,9 +11,9 @@ async function bootstrap() {
   const port = portValue !== undefined ? Number(portValue) : config.port ?? 3000;
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true, // remove propriedades que não estão no DTO,
-      forbidNonWhitelisted: true, // retorna erro se enviarem campos extras,
-      transform: true // transforma os tipos automaticamente
+      whitelist: true, // remove properties that are not defined on the DTO
+      forbidNonWhitelisted: true, // return an error if extra fields are sent
+      transform: true // automatically transform payload types
     })
   )
   app.use(helmet())
