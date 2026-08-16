@@ -20,7 +20,7 @@ export class SubscriptionsService {
     });
 
     if (!user) {
-      throw new NotFoundException('Usuário não encontrado');
+      throw new NotFoundException('User not found');
     }
 
     const plan = await this.prismaService.plan.findUnique({
@@ -30,7 +30,7 @@ export class SubscriptionsService {
     });
 
     if (!plan) {
-      throw new NotFoundException('Plano não encontrado');
+      throw new NotFoundException('Plan not found');
     }
 
     const existingSubscription =
@@ -42,7 +42,7 @@ export class SubscriptionsService {
       });
 
     if (existingSubscription) {
-      throw new ConflictException('Usuário já possui uma assinatura ativa');
+      throw new ConflictException('User already has an active subscription');
     }
 
     const subs = await this.prismaService.subscription.create({

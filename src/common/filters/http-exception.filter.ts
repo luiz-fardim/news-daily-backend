@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 
-// se deixar o @Catch() vazio, ele captura TODOS os erros da aplicação
+// if @Catch() is left empty, it captures ALL application errors
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
   private readonly logger = new Logger(AllExceptionsFilter.name);
@@ -18,34 +18,34 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
-    // descobre o status HTTP
+    // determine the HTTP status
     const status =
       exception instanceof HttpException
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    // extrai a mensagem de erro original
+    // extract the original error message
     const exceptionResponse =
       exception instanceof HttpException
         ? exception.getResponse()
         : null;
 
-    let message = 'Erro interno no servidor';
+    let message = 'Internal server error';
 
     if (typeof exceptionResponse === 'string') {
       message = exceptionResponse;
     } else if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
-      // se for um erro do ValidationPipe, ele vem dentro da propriedade 'message'
+      // if it's a ValidationPipe error, it comes inside the 'message' property
       message = (exceptionResponse as any).message || message;
     }
 
-    // registra o erro nos logs do servidor (com o stack trace para você depurar)
+    // log the error on the server (includes stack trace for debugging)
     this.logger.error(
       `HTTP Status: ${status} Error: ${JSON.stringify(message)}`,
       exception instanceof Error ? exception.stack : '',
     );
 
-    // retorna a resposta padronizada para o cliente
+    // return a standardized response to the client
     response.status(status).json({
       success: false,
       statusCode: status,

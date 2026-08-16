@@ -16,11 +16,11 @@ export class RolesGuard implements CanActivate {
     ]);
 
     if (!requiredRoles || requiredRoles.length === 0) {
-      return true; // rota sem @Roles() -> qualquer usuário autenticado passa
+      return true; // route without @Roles() -> any authenticated user passes
     }
 
     const { user } = context.switchToHttp().getRequest();
-    // user.role vem do que o JwtStrategy.validate() retornou
+    // user.role comes from what JwtStrategy.validate() returned
     const response = requiredRoles.includes(user?.role); 
     return response
   }
