@@ -10,6 +10,7 @@ import { PlansModule } from './modules/plans/plans.module';
 import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { BullModule } from '@nestjs/bullmq'
+import 'dotenv/config'
 
 @Module({
   imports: [
@@ -33,13 +34,10 @@ import { BullModule } from '@nestjs/bullmq'
     PaymentsModule,
     BullModule.forRoot({
       connection: {
-        host: 'localhost',
-        port: 6397
+        host: process.env.REDIS_HOST || 'localhost',
+        port: Number(process.env.REDIS_PORT) || 6379
       }
     }),
-    BullModule.registerQueue({
-      name: 'email-queue'
-    })  
   ],
   controllers: [],
   providers: [

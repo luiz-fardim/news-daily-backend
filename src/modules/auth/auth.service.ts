@@ -11,7 +11,8 @@ import { CreateAuthDto } from './dto/create-auth.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { createHash, randomBytes } from 'crypto';
 import { Role } from 'src/generated/prisma/browser';
-import { EmailsService } from '../emails/emails.service';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 
 @Injectable()
 export class AuthService {
@@ -19,7 +20,7 @@ export class AuthService {
     private prismaService: PrismaService,
     private jwtService: JwtService,
     private configService: ConfigService,
-    private emailsService: EmailsService
+    @InjectQueue('emails-queue') private emailsQueue: Queue,
   ) {}
 
   async create(data: CreateAuthDto) {
@@ -43,31 +44,45 @@ export class AuthService {
       },
     });
 
-    await this.emailsService.sendWelcomeEmail(data.email, data.first_name)
+    await this.emailsQueue.add('welcome-email', {
+      to: data.email,
+      name: data.first_name,
+    });
 
     const { password, ...userWithoutPassword } = user;
     return userWithoutPassword;
   }
 
   async compare(data: LoginAuthDto) {
-    const user: { email: string; password: string; id: number, role: Role } | null =
-      await this.prismaService.user.findFirst({
-        where: { email: data.email },
-        select: { email: true, password: true, id: true, role: true },
-      });
+    const user: {
+      email: string;
+      password: string;
+      id: number;
+      role: Role;
+    } | null = await this.prismaService.user.findFirst({
+      where: { email: data.email },
+      select: { email: true, password: true, id: true, role: true },
+    });
 
     if (!user) {
       throw new UnauthorizedException('Invalid Credentials');
     }
     const ramdomHash = randomBytes(64).toString('hex');
-    const isMatch = await argon2.verify(user?.password ?? ramdomHash, data.password);
+    const isMatch = await argon2.verify(
+      user?.password ?? ramdomHash,
+      data.password,
+    );
 
     if (!isMatch) {
       throw new UnauthorizedException('Invalid Credentials');
     }
     const payload = { email: user.email, id: user.id, role: user.role };
 
-    return await this.generateTokens(payload.id.toString(), payload.email, payload.role);
+    return await this.generateTokens(
+      payload.id.toString(),
+      payload.email,
+      payload.role,
+    );
   }
 
   async generateTokens(userId: string, email: string, role: Role) {
@@ -123,7 +138,11 @@ export class AuthService {
       data: { revoked: true },
     });
 
-    return this.generateTokens(stored.user_id.toString(), stored.user.email, stored.user.role);
+    return this.generateTokens(
+      stored.user_id.toString(),
+      stored.user.email,
+      stored.user.role,
+    );
   }
 
   async revokeAllUserTokens(userId: string) {
