@@ -1,6 +1,6 @@
 # 1. Use PostgreSQL for data persistence
 
-Date: 2026-07-29
+Date: 07/08/2026
 Status: Accepted
 
 ## Context

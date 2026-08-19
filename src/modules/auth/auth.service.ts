@@ -11,6 +11,7 @@ import { CreateAuthDto } from './dto/create-auth.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { createHash, randomBytes } from 'crypto';
 import { Role } from 'src/generated/prisma/browser';
+import { EmailsService } from '../emails/emails.service';
 
 @Injectable()
 export class AuthService {
@@ -18,6 +19,7 @@ export class AuthService {
     private prismaService: PrismaService,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private emailsService: EmailsService
   ) {}
 
   async create(data: CreateAuthDto) {
@@ -40,6 +42,9 @@ export class AuthService {
         birthday: new Date(data.birthday),
       },
     });
+
+    await this.emailsService.sendWelcomeEmail(data.email, data.first_name)
+
     const { password, ...userWithoutPassword } = user;
     return userWithoutPassword;
   }

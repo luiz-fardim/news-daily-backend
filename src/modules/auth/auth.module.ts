@@ -6,10 +6,12 @@ import { AuthService } from './auth.service';
 import { PrismaService } from 'src/prisma.service';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from 'src/guards/strategies/jwt.strategy';
+import { EmailsService } from '../emails/emails.service';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService, PrismaService, JwtService, JwtStrategy],
+  providers: [AuthService, PrismaService, JwtService, JwtStrategy, EmailsService
+  ],
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
@@ -28,6 +30,7 @@ import { JwtStrategy } from 'src/guards/strategies/jwt.strategy';
         };
       },
     }),
+    
   ],
 })
 export class AuthModule {}

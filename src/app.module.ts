@@ -8,7 +8,8 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
 import { UsersModule } from './modules/users/users.module';
 import { PlansModule } from './modules/plans/plans.module';
 import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
-import { PaymentsModule } from './payments/payments.module';
+import { PaymentsModule } from './modules/payments/payments.module';
+import { BullModule } from '@nestjs/bullmq'
 
 @Module({
   imports: [
@@ -29,7 +30,16 @@ import { PaymentsModule } from './payments/payments.module';
     UsersModule,
     PlansModule,
     SubscriptionsModule,
-    PaymentsModule
+    PaymentsModule,
+    BullModule.forRoot({
+      connection: {
+        host: 'localhost',
+        port: 6397
+      }
+    }),
+    BullModule.registerQueue({
+      name: 'email-queue'
+    })  
   ],
   controllers: [],
   providers: [
