@@ -14,7 +14,7 @@ export class EmailsService {
     try {
         await this.resend.emails.send({
       from: 'onboarding@resend.dev',
-      to: 'luizfernandofardim@gmail.com',
+      to: 'luizfernandofardim@gmail.com', // add your e-mail for tests
       subject: 'Hello World',
       html: `<strong>Bem-vindo, ${name}!</strong>`,
     });
