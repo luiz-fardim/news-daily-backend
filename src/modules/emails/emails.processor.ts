@@ -2,7 +2,7 @@ import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
 import { EmailsService } from './emails.service';
 
-@Processor('emails-queue') 
+@Processor('emails-queue')
 export class EmailsProcessor extends WorkerHost {
   constructor(private readonly emailsService: EmailsService) {
     super();

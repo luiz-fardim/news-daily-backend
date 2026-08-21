@@ -26,15 +26,16 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     // extract the original error message
     const exceptionResponse =
-      exception instanceof HttpException
-        ? exception.getResponse()
-        : null;
+      exception instanceof HttpException ? exception.getResponse() : null;
 
     let message = 'Internal server error';
 
     if (typeof exceptionResponse === 'string') {
       message = exceptionResponse;
-    } else if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
+    } else if (
+      typeof exceptionResponse === 'object' &&
+      exceptionResponse !== null
+    ) {
       // if it's a ValidationPipe error, it comes inside the 'message' property
       message = (exceptionResponse as any).message || message;
     }

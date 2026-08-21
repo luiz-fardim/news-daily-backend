@@ -60,7 +60,7 @@ RESEND_API_KEY="sua_chave"
 ```
 
 ### Instale as dependências
-
+    
 ```bash
 pnpm install
 ```

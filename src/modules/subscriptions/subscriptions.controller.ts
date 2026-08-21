@@ -1,4 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, ParseIntPipe, Query, DefaultValuePipe, ParseEnumPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Req,
+  ParseIntPipe,
+  Query,
+  DefaultValuePipe,
+  ParseEnumPipe,
+} from '@nestjs/common';
 import { SubscriptionsService } from './subscriptions.service';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
@@ -13,10 +27,7 @@ export class SubscriptionsController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  create(
-    @Body() createSubscriptionDto: CreateSubscriptionDto,
-    @Req() req
-  ) {
+  create(@Body() createSubscriptionDto: CreateSubscriptionDto, @Req() req) {
     return this.subscriptionsService.create(createSubscriptionDto, req.user);
   }
 
@@ -26,8 +37,12 @@ export class SubscriptionsController {
   findAll(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
-    @Query('statusQuery', new DefaultValuePipe(SubscriptionStatus.ACTIVE), new ParseEnumPipe(SubscriptionStatus)) 
-    statusQuery: SubscriptionStatus
+    @Query(
+      'statusQuery',
+      new DefaultValuePipe(SubscriptionStatus.ACTIVE),
+      new ParseEnumPipe(SubscriptionStatus),
+    )
+    statusQuery: SubscriptionStatus,
   ) {
     return this.subscriptionsService.findAll(page, limit, statusQuery);
   }
@@ -40,7 +55,10 @@ export class SubscriptionsController {
 
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSubscriptionDto: UpdateSubscriptionDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateSubscriptionDto: UpdateSubscriptionDto,
+  ) {
     return this.subscriptionsService.update(+id, updateSubscriptionDto);
   }
 

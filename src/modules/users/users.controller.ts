@@ -1,4 +1,15 @@
-import { Controller, Get, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, Query, DefaultValuePipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  ParseIntPipe,
+  Query,
+  DefaultValuePipe,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Roles } from 'src/guards/roles/decorators/roles.decorator';
@@ -25,8 +36,8 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   findOne(
-    @Param('id', ParseIntPipe) id: number, 
-    @CurrentUser('id') requestUserId: string
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser('id') requestUserId: string,
   ) {
     return this.usersService.findOne(id, Number(requestUserId));
   }
@@ -34,9 +45,10 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
   update(
-    @Param('id', ParseIntPipe) id: number, 
+    @Param('id', ParseIntPipe) id: number,
     @CurrentUser('id') requestUserId: string,
-    @Body() updateUserDto: UpdateUserDto) {
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
     return this.usersService.update(id, updateUserDto, Number(requestUserId));
   }
 
@@ -44,7 +56,7 @@ export class UsersController {
   @Delete(':id')
   remove(
     @Param('id', ParseIntPipe) id: number,
-    @CurrentUser('id') requestUserId: string  
+    @CurrentUser('id') requestUserId: string,
   ) {
     return this.usersService.remove(id, Number(requestUserId));
   }

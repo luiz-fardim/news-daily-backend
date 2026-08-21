@@ -37,7 +37,7 @@ export class SubscriptionsService {
       await this.prismaService.subscription.findFirst({
         where: {
           user_id: user.id,
-          status: "ACTIVE", // ajusta o valor conforme seu enum/schema
+          status: 'ACTIVE', // ajusta o valor conforme seu enum/schema
         },
       });
 
@@ -50,7 +50,7 @@ export class SubscriptionsService {
         ...data,
         user_id: user.id,
         plan_id: plan.id,
-        expires_at: this.calculateExpiresAt() 
+        expires_at: this.calculateExpiresAt(),
       },
     });
 
@@ -70,48 +70,48 @@ export class SubscriptionsService {
   }
 
   async findAll(page = 1, limit = 10, statusQuery: SubscriptionStatus) {
-  const take = limit;
-  const skip = (page - 1) * limit;
+    const take = limit;
+    const skip = (page - 1) * limit;
 
-  const where = { status: statusQuery };
+    const where = { status: statusQuery };
 
-  const [data, total] = await Promise.all([
-    this.prismaService.subscription.findMany({ skip, take, where }),
-    this.prismaService.subscription.count({ where }),
-  ]);
+    const [data, total] = await Promise.all([
+      this.prismaService.subscription.findMany({ skip, take, where }),
+      this.prismaService.subscription.count({ where }),
+    ]);
 
-  return {
-    data,
-    meta: {
-      total,
-      page,
-      last_page: Math.ceil(total / limit),
-    },
-  };
-}
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        last_page: Math.ceil(total / limit),
+      },
+    };
+  }
 
   async findOne(id: number) {
     return await this.prismaService.subscription.findUnique({
-      where: { id }
-    })
+      where: { id },
+    });
   }
 
   async update(id: number, updateSubscriptionDto: UpdateSubscriptionDto) {
     return await this.prismaService.subscription.update({
       where: { id },
-      data: { 
+      data: {
         ...updateSubscriptionDto,
-        plan_id: updateSubscriptionDto.plan_id
-       }
-    })
+        plan_id: updateSubscriptionDto.plan_id,
+      },
+    });
   }
 
   async remove(id: number) {
     return await this.prismaService.subscription.update({
       where: { id },
       data: {
-        status: SubscriptionStatus.CANCELED
-      } 
-    })
+        status: SubscriptionStatus.CANCELED,
+      },
+    });
   }
 }

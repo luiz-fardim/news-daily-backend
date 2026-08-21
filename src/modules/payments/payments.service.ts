@@ -5,21 +5,19 @@ import { ProcessPaymentDto } from './dto/process-payment.dto';
 
 @Injectable()
 export class PaymentsService {
-  constructor(
-    private readonly prismaService: PrismaService
-  ) {}
+  constructor(private readonly prismaService: PrismaService) {}
   async create(createPaymentDto: CreatePaymentDto) {
     const payment = await this.prismaService.payment.create({
       data: {
         ...createPaymentDto,
         amount: createPaymentDto.amount,
-        method: createPaymentDto.method
-      }
-    })
+        method: createPaymentDto.method,
+      },
+    });
   }
 
   async findAll() {
-    return await this.prismaService.payment.findMany()
+    return await this.prismaService.payment.findMany();
   }
 
   async processPayment(processPaymentDto: ProcessPaymentDto) {
@@ -27,14 +25,14 @@ export class PaymentsService {
       return await this.prismaService.payment.update({
         where: { id: processPaymentDto.payment_id },
         data: {
-          status: "APPROVED"
-        }
-      })
+          status: 'APPROVED',
+        },
+      });
     } else {
       return await this.prismaService.payment.update({
-        where: { id: processPaymentDto.payment_id},
-        data: { status: "CANCELED"}
-      })
+        where: { id: processPaymentDto.payment_id },
+        data: { status: 'CANCELED' },
+      });
     }
   }
 }
