@@ -4,7 +4,7 @@ import { EmailsService } from './emails.service';
 import { ConflictException } from '@nestjs/common';
 
 @Processor('emails-queue', {
-  concurrency: 5
+  concurrency: 5,
 })
 export class EmailsProcessor extends WorkerHost {
   constructor(private readonly emailsService: EmailsService) {
@@ -16,7 +16,7 @@ export class EmailsProcessor extends WorkerHost {
       const { to, name } = job.data;
       await this.emailsService.sendWelcomeEmail(to, name);
     } else {
-      throw new ConflictException("Error in sending e-mail.")
+      throw new ConflictException('Error in sending e-mail.');
     }
   }
 }
