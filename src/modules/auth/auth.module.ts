@@ -12,7 +12,13 @@ import { EmailsService } from '../emails/emails.service';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService, PrismaService, JwtService, JwtStrategy, EmailsService],
+  providers: [
+    AuthService,
+    PrismaService,
+    JwtService,
+    JwtStrategy,
+    EmailsService,
+  ],
   imports: [
     EmailsModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
@@ -20,7 +26,9 @@ import { EmailsService } from '../emails/emails.service';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        const jwtSecret = configService.get<string>('secrets.jwt_secret') ?? process.env.JWT_SECRET;
+        const jwtSecret =
+          configService.get<string>('secrets.jwt_secret') ??
+          process.env.JWT_SECRET;
 
         if (!jwtSecret) {
           throw new Error('JWT_SECRET is not configured');
@@ -33,8 +41,8 @@ import { EmailsService } from '../emails/emails.service';
       },
     }),
     BullModule.registerQueue({
-            name: 'emails-queue'
-        })    
+      name: 'emails-queue',
+    }),
   ],
 })
 export class AuthModule {}

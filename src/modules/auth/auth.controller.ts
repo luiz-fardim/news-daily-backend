@@ -14,6 +14,6 @@ export class AuthController {
 
   @Post('signin')
   signin(@Body() loginAuthDto: LoginAuthDto) {
-    return this.authService.compare(loginAuthDto)
+    return this.authService.compare(loginAuthDto);
   }
 }

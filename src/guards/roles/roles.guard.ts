@@ -5,9 +5,7 @@ import { ROLES_KEY } from './decorators/roles.decorator';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(
-    private reflector: Reflector
-  ) {}
+  constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
     const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
@@ -21,7 +19,7 @@ export class RolesGuard implements CanActivate {
 
     const { user } = context.switchToHttp().getRequest();
     // user.role comes from what JwtStrategy.validate() returned
-    const response = requiredRoles.includes(user?.role); 
-    return response
+    const response = requiredRoles.includes(user?.role);
+    return response;
   }
 }

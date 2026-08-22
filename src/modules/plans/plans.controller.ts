@@ -1,16 +1,25 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { PlansService } from './plans.service';
 import { CreatePlanDto } from './dto/create-plan.dto';
 import { UpdatePlanDto } from './dto/update-plan.dto';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/guards/roles/roles.guard';
-import { Roles} from 'src/guards/roles/decorators/roles.decorator';
+import { Roles } from 'src/guards/roles/decorators/roles.decorator';
 import { Role } from 'src/generated/prisma/browser';
 
 @Controller('plans')
 export class PlansController {
   constructor(private readonly plansService: PlansService) {}
-  
+
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @Post()
@@ -23,7 +32,7 @@ export class PlansController {
   findAll() {
     return this.plansService.findAll();
   }
-  
+
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {

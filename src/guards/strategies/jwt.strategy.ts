@@ -16,9 +16,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const secret = configService.get<string>('JWT_SECRET');
 
     if (!secret) {
-      throw new InternalServerErrorException(
-        'JWT_SECRET is not defined',
-      );
+      throw new InternalServerErrorException('JWT_SECRET is not defined');
     }
 
     super({

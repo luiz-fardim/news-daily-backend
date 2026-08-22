@@ -26,7 +26,7 @@ Cada plano tem uma frequência de envio diferente (semanal, três vezes por sema
 
 ## Stack
 
-NestJS, TypeScript, PostgreSQL, Prisma, JWT, Docker
+NestJS, TypeScript, PostgreSQL, Prisma, JWT, Docker, BullMQ, Redis
 
 ---
 
@@ -41,8 +41,8 @@ NestJS, TypeScript, PostgreSQL, Prisma, JWT, Docker
 ### Clone o projeto
 
 ```bash
-git clone https://github.com/seu-usuario/newsclub-api.git
-cd newsclub-api
+git clone https://github.com/luiz-fardim/news-daily-backend
+cd news-daily-backend
 ```
 
 ### Configure as variáveis de ambiente
@@ -50,21 +50,28 @@ cd newsclub-api
 Crie um arquivo `.env`:
 
 ```env
-DATABASE_URL="postgresql://usuario:senha@localhost:5432/newsclub"
+DATABASE_URL="postgresql://usuario:senha@localhost:5432/my_app_database"
 JWT_SECRET="sua_chave_secreta"
 JWT_REFRESH_SECRET="sua_chave_secreta_de_refresh"
 PORT=3000
 POSTGRES_USER="seu_usuario"
 POSTGRES_PASSWORD="sua_senha"
+RESEND_API_KEY="sua_chave"
 ```
 
 ### Instale as dependências
-
+    
 ```bash
 pnpm install
 ```
 
-### Suba os containers
+### Suba os containers (Redis)
+
+```bash
+docker run --name my-redis -p 6379:6379 -d redis
+```
+
+### Suba os containers (PostgreSQL)
 
 ```bash
 docker compose up -d
