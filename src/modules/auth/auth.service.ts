@@ -44,10 +44,20 @@ export class AuthService {
       },
     });
 
-    await this.emailsQueue.add('welcome-email', {
-      to: data.email,
-      name: data.first_name,
-    });
+    await this.emailsQueue.add(
+      'welcome-email',
+      {
+        to: data.email,
+        name: data.first_name,
+      },
+      {
+        attempts: 3,
+        backoff: { type: 'exponential', delay: 1000 },
+        removeOnComplete: true,
+        removeOnFail: false,
+        jobId: `welcome-email-${data.email}`,
+      },
+    );
 
     const { password, ...userWithoutPassword } = user;
     return userWithoutPassword;

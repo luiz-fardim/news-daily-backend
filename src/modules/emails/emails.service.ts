@@ -15,7 +15,7 @@ export class EmailsService {
       await this.resend.emails.send({
         from: 'onboarding@resend.dev',
         to: 'luizfernandofardim@gmail.com', // add your e-mail for tests
-        subject: 'Hello World',
+        subject: 'Sua confirmação de cadastro no News Daily!',
         html: `<div style="font-family: Arial, Helvetica, sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;">
   <p style="margin: 0 0 16px 0; font-size: 18px; font-weight: bold; color: #18181b;">
     News Daily - Seu dia começa aqui!
