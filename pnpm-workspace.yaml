@@ -4,3 +4,9 @@ allowBuilds:
   msgpackr-extract: true
   prisma: true
   unrs-resolver: true
+onlyBuiltDependencies:
+  - argon2
+  - "@prisma/engines"
+  - prisma
+  - msgpackr-extract
+  - unrs-resolver 
