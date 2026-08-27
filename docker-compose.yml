@@ -17,5 +17,38 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  api:
+    build:
+      context: .
+      target: dependencies      # usa o stage que já tem o node_modules com argon2 compilado
+    container_name: api
+    restart: always
+    command: pnpm start:dev
+    ports:
+      - "3000:3000"             # ajusta pra porta que sua API usa
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/my_app_database
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - /app/node_modules       # protege o node_modules do container de ser sobrescrito
+
 volumes:
   pgdata:
